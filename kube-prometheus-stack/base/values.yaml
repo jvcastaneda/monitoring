@@ -1,0 +1,2 @@
+# Chart default values, override as needed.
+# https://github.com/prometheus-community/helm-charts/blob/kube-prometheus-stack-88.5.4/charts/kube-prometheus-stack/values.yaml

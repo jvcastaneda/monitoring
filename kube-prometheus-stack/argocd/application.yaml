@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: prometheus-operator
+  name: kube-prometheus-stack
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -11,7 +11,7 @@ spec:
   source:
     repoURL: https://github.com/jvcastaneda/monitoring.git
     targetRevision: main
-    path: prometheus-operator/base
+    path: kube-prometheus-stack/base
 
   destination:
     server: https://kubernetes.default.svc
