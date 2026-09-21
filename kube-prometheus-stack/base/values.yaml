@@ -1,2 +1,8 @@
 # Chart default values, override as needed.
 # https://github.com/prometheus-community/helm-charts/blob/kube-prometheus-stack-88.5.4/charts/kube-prometheus-stack/values.yaml
+
+prometheus:
+  prometheusSpec:
+    # 35d so the 30d SLO windows in ts-telemetry-demo (docs/SLO.md) have a full
+    # window of data. The chart default is 10d.
+    retention: 35d
