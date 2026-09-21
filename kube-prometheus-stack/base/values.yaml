@@ -6,3 +6,13 @@ prometheus:
     # 35d so the 30d SLO windows in ts-telemetry-demo (docs/SLO.md) have a full
     # window of data. The chart default is 10d.
     retention: 35d
+    # Persist the TSDB across pod restarts; without this Prometheus uses
+    # emptyDir and the 35d of history is lost on every reschedule.
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: gp2
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 20Gi
