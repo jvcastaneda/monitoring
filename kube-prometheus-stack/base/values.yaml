@@ -11,8 +11,48 @@ prometheus:
     storageSpec:
       volumeClaimTemplate:
         spec:
-          storageClassName: gp2
+          # gp3 is the lab cluster's default class (gp2 isn't created on
+          # current EKS versions, so a gp2 claim would stay Pending forever).
+          storageClassName: gp3
           accessModes: ["ReadWriteOnce"]
           resources:
             requests:
               storage: 20Gi
+
+grafana:
+  # The chart's default admin password is public knowledge; this Secret is
+  # created with a random password by the lab's Terraform before Argo CD syncs.
+  admin:
+    existingSecret: grafana-admin
+    userKey: admin-user
+    passwordKey: admin-password
+
+  grafana.ini:
+    server:
+      root_url: https://grafana.lab.codebee.org
+
+  # Joins the lab's shared ALB (group set by the "alb" IngressClassParams);
+  # TLS comes from the wildcard ACM cert and DNS from external-dns.
+  ingress:
+    enabled: true
+    ingressClassName: alb
+    annotations:
+      alb.ingress.kubernetes.io/target-type: ip
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+      alb.ingress.kubernetes.io/ssl-redirect: "443"
+      alb.ingress.kubernetes.io/healthcheck-path: /api/health
+    hosts:
+      - grafana.lab.codebee.org
+    path: /
+
+# EKS runs the control plane, so etcd, the scheduler and the controller-manager
+# can't be scraped, and kube-proxy only binds its metrics to localhost. Left on,
+# they show up as permanently down targets with alerts firing.
+kubeEtcd:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubeControllerManager:
+  enabled: false
+kubeProxy:
+  enabled: false
